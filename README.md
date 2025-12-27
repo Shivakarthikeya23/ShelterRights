@@ -1,112 +1,81 @@
 # ShelterRights - Housing Affordability & Advocacy Platform
 
-A comprehensive platform helping renters and homebuyers navigate the housing crisis through affordability calculators, tenant rights assistance, property search, and community organizing tools.
+A robust, modern platform designed to empower renters and homebuyers with data-driven insights and community organizing tools. Built for high-impact advocacy and personal financial security.
 
-## 🚀 Tech Stack
+## 🚀 Key Features
 
-**Frontend:**
-- React 18 + TypeScript
-- Vite
-- Tailwind CSS + shadcn/ui
-- React Router DOM
-- Zustand (State Management)
-- Supabase (Auth + Database)
+### 1. Rent Burden Calculator (`/rent-calculator`)
+- **Real-time Analysis:** Instant feedback on housing affordability as you type.
+- **Visual Insights:** High-quality charts (Bar & Pie) comparing your costs to federal guidelines.
+- **AI Financial Coach:** Gemini-powered situational analysis with practical steps to reduce burden.
 
-**Backend:**
-- Node.js + Express + TypeScript
-- Supabase (PostgreSQL)
-- OpenAI API (AI features)
-- Playwright (Web scraping)
+### 2. Homebuyer Affordability (`/buy-calculator`)
+- **Realistic Budgeting:** Compares "Bank Max" loan limits against sustainable living data.
+- **Hidden Costs:** Breakdown of property tax, maintenance, and insurance impact.
+- **Buy Signals:** Automated readiness score based on savings and credit.
 
-## 📦 Installation
+### 3. AI Property Search (`/search`)
+- **Aggregated Listings:** Split-screen map view powered by Mapbox.
+- **True Cost Engine:** Automated calculation of the total cost of ownership for every listing.
 
-### Prerequisites
-- Node.js 20+
-- npm or yarn
-- Supabase account
-- OpenAI API key
+### 4. Tenant Rights Assistant (`/rights-chatbot`)
+- **State-Specific IQ:** AI chatbot trained on local housing laws (TX, NY, CA, FL, etc.).
+- **Proactive Advice:** Instant answers to evictions, repairs, and security deposit disputes.
 
-### Setup Steps
-
-1. **Clone the repository**
-```bash
-   git clone <your-repo-url>
-   cd shelter-rights
-```
-
-2. **Setup Frontend**
-```bash
-   cd frontend
-   npm install
-   cp .env.example .env
-   # Edit .env with your Supabase credentials
-```
-
-3. **Setup Backend**
-```bash
-   cd ../backend
-   npm install
-   cp .env.example .env
-   # Edit .env with your credentials
-```
-
-4. **Run Development Servers**
-
-Terminal 1 - Frontend:
-```bash
-   cd frontend
-   npm run dev
-```
-
-Terminal 2 - Backend:
-```bash
-   cd backend
-   npm run dev
-```
-
-5. **Access Application**
-   - Frontend: http://localhost:5173
-   - Backend: http://localhost:3001
-
-## 🏗️ Project Structure
-```
-shelter-rights/
-├── frontend/          # React frontend
-│   ├── src/
-│   │   ├── components/    # Reusable components
-│   │   ├── pages/        # Route pages
-│   │   ├── stores/       # Zustand state stores
-│   │   ├── lib/          # Utilities & API clients
-│   │   └── types/        # TypeScript types
-├── backend/           # Express backend
-│   ├── src/
-│   │   ├── routes/       # API routes
-│   │   ├── controllers/  # Route handlers
-│   │   ├── services/     # Business logic
-│   │   └── middleware/   # Express middleware
-```
-
-## 🎯 Development Phases
-
-- [x] Phase 0: Project Setup & Architecture
-- [ ] Phase 1: Auth & User Profiles
-- [ ] Phase 2: Renter Features
-- [ ] Phase 3: Buyer Features
-- [ ] Phase 4: Shared Features & Polish
-- [ ] Phase 5: Deployment
-
-## 📝 Environment Variables
-
-See `.env.example` files in frontend and backend directories for required environment variables.
-
-## 🤝 Contributing
-
-This project is being built for CodeSpring Hackathon 2024.
-
-## 📄 License
-
-MIT
+### 5. Community Organizer (`/organize`)
+- **Micro-Campaigns:** Launch and sign local housing petitions in seconds.
+- **Automated Copywriting:** AI generates compelling campaign descriptions for maximum impact.
 
 ---
 
-Built with ❤️ for housing justice
+## 🛠 Tech Stack
+
+**Frontend:**
+- React 18 + TypeScript + Vite
+- Tailwind CSS (Premium Configuration)
+- Framer Motion (Animations)
+- Recharts (Data Viz)
+- Mapbox GL JS (Maps)
+- Zustand (State)
+
+**Backend:**
+- Node.js + Express + TypeScript
+- Supabase (PostgreSQL + Auth)
+- Google Gemini AI (Generative Models)
+- Playwright (Property Scrapers)
+
+---
+
+## 📦 Installation & Setup
+
+### Prerequisites
+- Node.js 18+
+- Supabase Account
+- Gemini API Key ([Get one here](https://aistudio.google.com/app/apikey))
+
+### 1. Backend Setup
+```bash
+cd backend
+npm install
+cp .env.example .env
+# Update .env with your Supabase and Gemini keys
+npm run dev
+```
+
+### 2. Frontend Setup
+```bash
+cd frontend
+npm install
+cp .env.example .env
+# Update .env with your Supabase URL and Mapbox Token
+npm run dev
+```
+
+## 🎯 Success Criteria
+- ✅ 100% Mobile Responsive
+- ✅ Sub-3s Load Times
+- ✅ Accessible UI (WCAG 2.1)
+- ✅ Production-ready Auth patterns
+
+---
+*Built with ❤️ for Housing Justice and the 131 Million Americans struggling with affordability.*
