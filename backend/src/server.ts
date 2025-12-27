@@ -7,6 +7,8 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 import userRoutes from './routes/user.routes';
+import renterRoutes from './routes/renter.routes';
+import propertyRoutes from './routes/property.routes';
 
 const app: Express = express();
 const PORT = process.env.PORT || 3001;
@@ -32,6 +34,8 @@ app.get('/health', (req: Request, res: Response) => {
 
 // API Routes
 app.use('/api/users', userRoutes);
+app.use('/api/renter', renterRoutes);
+app.use('/api/property', propertyRoutes);
 
 // 404 handler
 app.use((req: Request, res: Response) => {
