@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import AppHeader from '../../components/layout/AppHeader';
 import { renterApi } from '../../lib/renterApi';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
@@ -12,10 +13,13 @@ import {
   MapPin, 
   Share2, 
   Target,
-  Flame
+  Flame,
+  ArrowLeft
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export default function CommunityOrganizerPage() {
+  const navigate = useNavigate();
   const [campaigns, setCampaigns] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -73,10 +77,20 @@ export default function CommunityOrganizerPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-20 text-slate-900 dark:text-slate-50">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-50">
+      <AppHeader />
+      <div className="pb-20">
       {/* Dynamic Header */}
       <section className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
         <div className="container mx-auto px-6 py-16 max-w-7xl">
+        <Button
+            variant="ghost"
+            onClick={() => navigate('/dashboard')}
+            className="mb-4 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-900"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Dashboard
+          </Button>
            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
               <div>
                 <motion.div 
@@ -236,6 +250,7 @@ export default function CommunityOrganizerPage() {
            </motion.div>
         </div>
       )}
+      </div>
     </div>
   );
 }
