@@ -1,13 +1,35 @@
--- SHELTERRIGHTS DATABASE SCHEMA
+-- SHELTERRIGHTS DATABASE SCHEMA - UPDATED
 -- Supabase PostgreSQL Database Setup
 -- Run this SQL in your Supabase SQL Editor
+-- 
+-- IMPORTANT: This will DROP all existing tables and recreate them
+-- Make sure to backup any important data first!
+
+-- ============================================
+-- DROP EXISTING TABLES (if they exist)
+-- ============================================
+DROP TABLE IF EXISTS signatures CASCADE;
+DROP TABLE IF EXISTS saved_properties CASCADE;
+DROP TABLE IF EXISTS campaigns CASCADE;
+DROP TABLE IF EXISTS chat_history CASCADE;
+DROP TABLE IF EXISTS buyer_calculations CASCADE;
+DROP TABLE IF EXISTS rent_calculations CASCADE;
+DROP TABLE IF EXISTS buyer_data CASCADE;
+DROP TABLE IF EXISTS renter_data CASCADE;
+DROP TABLE IF EXISTS user_profiles CASCADE;
+
+-- Drop functions and triggers
+DROP FUNCTION IF EXISTS update_updated_at_column() CASCADE;
+DROP FUNCTION IF EXISTS handle_new_user() CASCADE;
+DROP VIEW IF EXISTS campaign_stats CASCADE;
 
 -- ============================================
 -- USER PROFILES TABLE
 -- ============================================
-CREATE TABLE IF NOT EXISTS user_profiles (
+CREATE TABLE user_profiles (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE UNIQUE NOT NULL,
+  full_name TEXT,
   is_renter BOOLEAN DEFAULT false,
   is_buyer BOOLEAN DEFAULT false,
   is_owner BOOLEAN DEFAULT false,
@@ -35,24 +57,73 @@ CREATE POLICY "Users can update own profile" ON user_profiles
 CREATE POLICY "Users can insert own profile" ON user_profiles
   FOR INSERT WITH CHECK (auth.uid() = user_id);
 
--- Trigger to auto-create profile on signup
-CREATE OR REPLACE FUNCTION public.handle_new_user()
-RETURNS TRIGGER AS $$
-BEGIN
-  INSERT INTO public.user_profiles (user_id, is_renter, current_mode)
-  VALUES (NEW.id, true, 'renter');
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+-- Index for performance
+CREATE INDEX idx_user_profiles_user_id ON user_profiles(user_id);
 
-CREATE TRIGGER on_auth_user_created
-  AFTER INSERT ON auth.users
-  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+-- ============================================
+-- RENTER DATA TABLE
+-- ============================================
+CREATE TABLE renter_data (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE UNIQUE NOT NULL,
+  current_rent NUMERIC,
+  utilities_cost NUMERIC,
+  commute_cost NUMERIC,
+  other_housing_costs NUMERIC,
+  notes TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- RLS Policies
+ALTER TABLE renter_data ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can view own renter data" ON renter_data
+  FOR SELECT USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can update own renter data" ON renter_data
+  FOR UPDATE USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert own renter data" ON renter_data
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+-- Index
+CREATE INDEX idx_renter_data_user_id ON renter_data(user_id);
+
+-- ============================================
+-- BUYER DATA TABLE
+-- ============================================
+CREATE TABLE buyer_data (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE UNIQUE NOT NULL,
+  down_payment NUMERIC,
+  credit_score INTEGER,
+  debt_amount NUMERIC,
+  monthly_debt_payments NUMERIC,
+  notes TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- RLS Policies
+ALTER TABLE buyer_data ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can view own buyer data" ON buyer_data
+  FOR SELECT USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can update own buyer data" ON buyer_data
+  FOR UPDATE USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert own buyer data" ON buyer_data
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+-- Index
+CREATE INDEX idx_buyer_data_user_id ON buyer_data(user_id);
 
 -- ============================================
 -- RENT CALCULATIONS TABLE
 -- ============================================
-CREATE TABLE IF NOT EXISTS rent_calculations (
+CREATE TABLE rent_calculations (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
   annual_income NUMERIC NOT NULL,
@@ -79,14 +150,14 @@ CREATE POLICY "Users can insert own calculations" ON rent_calculations
 CREATE POLICY "Users can delete own calculations" ON rent_calculations
   FOR DELETE USING (auth.uid() = user_id);
 
--- Index for performance
+-- Indexes for performance
 CREATE INDEX idx_rent_calculations_user_id ON rent_calculations(user_id);
 CREATE INDEX idx_rent_calculations_created_at ON rent_calculations(created_at DESC);
 
 -- ============================================
 -- BUYER CALCULATIONS TABLE
 -- ============================================
-CREATE TABLE IF NOT EXISTS buyer_calculations (
+CREATE TABLE buyer_calculations (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
   annual_income NUMERIC NOT NULL,
@@ -114,11 +185,12 @@ CREATE POLICY "Users can delete own buyer calcs" ON buyer_calculations
 
 -- Index
 CREATE INDEX idx_buyer_calculations_user_id ON buyer_calculations(user_id);
+CREATE INDEX idx_buyer_calculations_created_at ON buyer_calculations(created_at DESC);
 
 -- ============================================
 -- CHAT HISTORY TABLE (Tenant Rights)
 -- ============================================
-CREATE TABLE IF NOT EXISTS chat_history (
+CREATE TABLE chat_history (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
   state TEXT NOT NULL,
@@ -139,13 +211,17 @@ CREATE POLICY "Users can insert own chat history" ON chat_history
 CREATE POLICY "Users can update own chat history" ON chat_history
   FOR UPDATE USING (auth.uid() = user_id);
 
+CREATE POLICY "Users can delete own chat history" ON chat_history
+  FOR DELETE USING (auth.uid() = user_id);
+
 -- Index
 CREATE INDEX idx_chat_history_user_id ON chat_history(user_id);
+CREATE INDEX idx_chat_history_state ON chat_history(state);
 
 -- ============================================
 -- CAMPAIGNS TABLE (Community Organizing)
 -- ============================================
-CREATE TABLE IF NOT EXISTS campaigns (
+CREATE TABLE campaigns (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   creator_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
   title TEXT NOT NULL,
@@ -171,15 +247,19 @@ CREATE POLICY "Authenticated users can create campaigns" ON campaigns
 CREATE POLICY "Creators can update own campaigns" ON campaigns
   FOR UPDATE USING (auth.uid() = creator_id);
 
+CREATE POLICY "Creators can delete own campaigns" ON campaigns
+  FOR DELETE USING (auth.uid() = creator_id);
+
 -- Indexes
 CREATE INDEX idx_campaigns_status ON campaigns(status);
 CREATE INDEX idx_campaigns_location ON campaigns(location_state, location_city);
 CREATE INDEX idx_campaigns_created_at ON campaigns(created_at DESC);
+CREATE INDEX idx_campaigns_creator_id ON campaigns(creator_id);
 
 -- ============================================
 -- SIGNATURES TABLE (Campaign Signatures)
 -- ============================================
-CREATE TABLE IF NOT EXISTS signatures (
+CREATE TABLE signatures (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   campaign_id UUID REFERENCES campaigns(id) ON DELETE CASCADE NOT NULL,
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
@@ -198,6 +278,9 @@ CREATE POLICY "Anyone can view signatures" ON signatures
 CREATE POLICY "Authenticated users can sign" ON signatures
   FOR INSERT WITH CHECK (auth.uid() = user_id);
 
+CREATE POLICY "Users can delete own signatures" ON signatures
+  FOR DELETE USING (auth.uid() = user_id);
+
 -- Indexes
 CREATE INDEX idx_signatures_campaign_id ON signatures(campaign_id);
 CREATE INDEX idx_signatures_user_id ON signatures(user_id);
@@ -205,7 +288,7 @@ CREATE INDEX idx_signatures_user_id ON signatures(user_id);
 -- ============================================
 -- SAVED PROPERTIES TABLE
 -- ============================================
-CREATE TABLE IF NOT EXISTS saved_properties (
+CREATE TABLE saved_properties (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
   property_data JSONB NOT NULL,
@@ -241,8 +324,17 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- Apply trigger to tables with updated_at
 CREATE TRIGGER update_user_profiles_updated_at
   BEFORE UPDATE ON user_profiles
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_renter_data_updated_at
+  BEFORE UPDATE ON renter_data
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_buyer_data_updated_at
+  BEFORE UPDATE ON buyer_data
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 CREATE TRIGGER update_chat_history_updated_at
@@ -252,6 +344,21 @@ CREATE TRIGGER update_chat_history_updated_at
 CREATE TRIGGER update_campaigns_updated_at
   BEFORE UPDATE ON campaigns
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- Auto-create profile on user signup with ALL modes enabled by default
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO public.user_profiles (user_id, is_renter, is_buyer, is_owner, current_mode)
+  VALUES (NEW.id, true, true, true, 'renter')
+  ON CONFLICT (user_id) DO NOTHING;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 
 -- ============================================
 -- VIEWS (Optional - for convenience)
@@ -268,17 +375,23 @@ LEFT JOIN signatures s ON c.id = s.campaign_id
 GROUP BY c.id;
 
 -- ============================================
--- SAMPLE DATA (Optional - for testing)
+-- VERIFICATION QUERIES
 -- ============================================
+-- Run these to verify everything was created correctly:
 
--- Uncomment to insert sample campaigns for testing
-/*
-INSERT INTO campaigns (creator_id, title, description, location_city, location_state, goal_signatures)
-VALUES 
-  (auth.uid(), 'Cap Rent Increases at 5%', 'Rent increases in our city have averaged 15% annually. We demand a cap at 5% to match inflation.', 'Austin', 'TX', 500),
-  (auth.uid(), 'Require Landlord Licensing', 'Hold landlords accountable with mandatory licensing and regular property inspections.', 'Austin', 'TX', 1000),
-  (auth.uid(), 'Protect Tenants from No-Cause Evictions', 'End no-cause evictions that force families out of their homes without just cause.', 'San Francisco', 'CA', 750);
-*/
+-- Check all tables exist
+-- SELECT table_name FROM information_schema.tables 
+-- WHERE table_schema = 'public' 
+-- ORDER BY table_name;
+
+-- Check RLS is enabled
+-- SELECT tablename, rowsecurity FROM pg_tables 
+-- WHERE schemaname = 'public';
+
+-- Check policies exist
+-- SELECT tablename, policyname FROM pg_policies 
+-- WHERE schemaname = 'public'
+-- ORDER BY tablename, policyname;
 
 -- ============================================
 -- NOTES FOR DEPLOYMENT
@@ -302,7 +415,7 @@ IMPORTANT SETUP STEPS:
 TROUBLESHOOTING:
 
 If profile auto-creation doesn't work:
-- Check that the trigger exists: SELECT * FROM information_schema.triggers;
+- Check that the trigger exists: SELECT * FROM information_schema.triggers WHERE trigger_name = 'on_auth_user_created';
 - Verify the function exists: SELECT * FROM pg_proc WHERE proname = 'handle_new_user';
 - Test manually: INSERT INTO auth.users ... and check if profile was created
 
@@ -310,4 +423,9 @@ If RLS is blocking operations:
 - Temporarily disable for testing: ALTER TABLE table_name DISABLE ROW LEVEL SECURITY;
 - Check auth.uid() returns correct value: SELECT auth.uid();
 - Verify policies: SELECT * FROM pg_policies WHERE tablename = 'your_table';
+
+COLUMN MAPPING:
+- Frontend sends: isBuyer, isRenter, isOwner, fullName, annualIncome, etc. (camelCase)
+- Backend converts to: is_buyer, is_renter, is_owner, full_name, annual_income, etc. (snake_case)
+- Database stores: snake_case (as defined in this schema)
 */
