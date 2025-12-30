@@ -1,5 +1,7 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import AppHeader from '@/components/layout/AppHeader';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell,
 } from 'recharts';
@@ -20,11 +22,13 @@ import {
   Wallet,
   Home,
   ChevronRight,
-  Info
+  Info,
+  ArrowLeft
 } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 
 export default function BuyCalculatorPage() {
+  const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [income, setIncome] = useState('');
   const [savings, setSavings] = useState('');
@@ -48,10 +52,20 @@ export default function BuyCalculatorPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-20">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+      <AppHeader />
+      <div className="pb-20">
       {/* Header */}
       <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 mb-8">
         <div className="container mx-auto px-4 py-12 max-w-6xl">
+          <Button
+            variant="ghost"
+            onClick={() => navigate('/dashboard')}
+            className="mb-4 text-slate-600  dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-900"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Dashboard
+          </Button>
            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div>
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 text-sm font-medium mb-4">
@@ -59,7 +73,7 @@ export default function BuyCalculatorPage() {
                 <span>Homebuyer Tool</span>
               </div>
               <h1 className="text-4xl font-bold tracking-tight text-slate-900 dark:text-white mb-2">
-                Homebuyer Affordability
+                Buying Power Calculator
               </h1>
               <p className="text-lg text-slate-500 dark:text-slate-400 max-w-2xl">
                 Discover your true buying power. We compare what the bank says you can afford vs. what is actually sustainable for your lifestyle.
@@ -304,6 +318,7 @@ export default function BuyCalculatorPage() {
             )}
           </div>
         </div>
+      </div>
       </div>
     </div>
   );
