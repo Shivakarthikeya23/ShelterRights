@@ -28,18 +28,42 @@ export async function getUserProfile(userId: string) {
 
 // Helper: Create/Update user profile
 export async function upsertUserProfile(userId: string, profileData: any) {
-  const { data, error } = await supabase
+  // First, try to get existing profile
+  const { data: existing } = await supabase
     .from('user_profiles')
-    .upsert({
-      user_id: userId,
-      ...profileData,
-      updated_at: new Date().toISOString()
-    })
-    .select()
+    .select('id')
+    .eq('user_id', userId)
     .single();
-  
-  if (error) throw error;
-  return data;
+
+  if (existing) {
+    // Update existing profile
+    const { data, error } = await supabase
+      .from('user_profiles')
+      .update({
+        ...profileData,
+        updated_at: new Date().toISOString()
+      })
+      .eq('user_id', userId)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data;
+  } else {
+    // Insert new profile
+    const { data, error } = await supabase
+      .from('user_profiles')
+      .insert({
+        user_id: userId,
+        ...profileData,
+        updated_at: new Date().toISOString()
+      })
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data;
+  }
 }
 
 // Helper: Get renter data
