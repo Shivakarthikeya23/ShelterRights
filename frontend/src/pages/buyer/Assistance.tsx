@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
@@ -16,8 +17,10 @@ import {
   Shield,
   TrendingUp,
   Calendar,
-  AlertCircle
+  AlertCircle,
+  ArrowLeft
 } from 'lucide-react';
+import AppHeader from '@/components/layout/AppHeader';
 
 // Mock assistance programs database
 const ASSISTANCE_PROGRAMS = [
@@ -101,6 +104,7 @@ const ASSISTANCE_PROGRAMS = [
 ];
 
 export default function AssistancePage() {
+  const navigate = useNavigate();
   const [income, setIncome] = useState('');
   const [homePrice, setHomePrice] = useState('');
   const [isFirstTime, setIsFirstTime] = useState(false);
@@ -131,10 +135,20 @@ export default function AssistancePage() {
   const totalAssistance = eligiblePrograms.reduce((sum, p) => sum + Math.min(p.maxAmount, price * (p.downPaymentPercent / 100)), 0);
 
   return (
+    <>
+    <AppHeader />
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-20">
       {/* Header */}
       <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 mb-8">
         <div className="container mx-auto px-4 py-12 max-w-6xl">
+          <Button
+            variant="ghost"
+            onClick={() => navigate('/dashboard')}
+            className="mb-4 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Dashboard
+          </Button>
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400 text-sm font-medium mb-4">
             <Award className="h-4 w-4" />
             <span>Financial Assistance</span>
@@ -153,13 +167,13 @@ export default function AssistancePage() {
           <div className="max-w-2xl mx-auto">
             <Card className="shadow-xl border-0">
               <CardHeader>
-                <CardTitle className="text-2xl text-slate-900 dark:text-white">Find Your Assistance</CardTitle>
+                <CardTitle className="text-2xl text-slate-900">Find Your Assistance</CardTitle>
                 <CardDescription>Answer a few questions to see programs you qualify for</CardDescription>
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleSearch} className="space-y-6">
                   <div className="space-y-2">
-                    <Label className="text-slate-900 dark:text-white">Annual Household Income</Label>
+                    <Label className="text-slate-900">Annual Household Income</Label>
                     <div className="relative">
                       <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                       <Input
@@ -174,7 +188,7 @@ export default function AssistancePage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label className="text-slate-900 dark:text-white">Target Home Price</Label>
+                    <Label className="text-slate-900">Target Home Price</Label>
                     <div className="relative">
                       <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                       <Input
@@ -189,7 +203,7 @@ export default function AssistancePage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label className="text-slate-900 dark:text-white">Location (City or State)</Label>
+                    <Label className="text-slate-900">Location (City or State)</Label>
                     <Input
                       type="text"
                       className="h-12 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
@@ -201,7 +215,7 @@ export default function AssistancePage() {
                   </div>
 
                   <div className="space-y-3">
-                    <Label className="text-slate-900 dark:text-white">Eligibility (Check all that apply)</Label>
+                    <Label className="text-slate-900">Eligibility (Check all that apply)</Label>
                     
                     <div className="flex items-center space-x-2">
                       <Checkbox
@@ -209,7 +223,7 @@ export default function AssistancePage() {
                         checked={isFirstTime}
                         onCheckedChange={(checked) => setIsFirstTime(checked as boolean)}
                       />
-                      <label htmlFor="firstTime" className="text-sm cursor-pointer text-slate-700 dark:text-slate-300">
+                      <label htmlFor="firstTime" className="text-sm cursor-pointer text-slate-700">
                         I am a first-time homebuyer (or haven't owned in 3+ years)
                       </label>
                     </div>
@@ -220,7 +234,7 @@ export default function AssistancePage() {
                         checked={isVeteran}
                         onCheckedChange={(checked) => setIsVeteran(checked as boolean)}
                       />
-                      <label htmlFor="veteran" className="text-sm cursor-pointer text-slate-700 dark:text-slate-300">
+                      <label htmlFor="veteran" className="text-sm cursor-pointer text-slate-700">
                         I am a veteran or active military
                       </label>
                     </div>
@@ -231,7 +245,7 @@ export default function AssistancePage() {
                         checked={hasEmployerProgram}
                         onCheckedChange={(checked) => setHasEmployerProgram(checked as boolean)}
                       />
-                      <label htmlFor="employer" className="text-sm cursor-pointer text-slate-700 dark:text-slate-300">
+                      <label htmlFor="employer" className="text-sm cursor-pointer text-slate-700">
                         My employer offers homebuying assistance
                       </label>
                     </div>
@@ -251,13 +265,13 @@ export default function AssistancePage() {
               <CardContent className="pt-6">
                 <div className="flex flex-col md:flex-row justify-between items-center gap-6">
                   <div>
-                    <div className="text-sm font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2">
+                    <div className="text-sm font-bold text-slate-600uppercase tracking-wider mb-2">
                       Total Potential Assistance
                     </div>
                     <div className="text-5xl font-black text-green-600 dark:text-green-400 mb-2">
                       {formatCurrency(totalAssistance)}
                     </div>
-                    <div className="text-slate-600 dark:text-slate-300">
+                    <div className="text-slate-600">
                       From {eligiblePrograms.length} eligible program{eligiblePrograms.length !== 1 ? 's' : ''}
                     </div>
                   </div>
@@ -273,7 +287,7 @@ export default function AssistancePage() {
               <Card>
                 <CardContent className="pt-6 text-center py-12">
                   <AlertCircle className="h-12 w-12 text-slate-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">No Programs Found</h3>
+                  <h3 className="text-lg font-bold text-slate-900 mb-2">No Programs Found</h3>
                   <p className="text-slate-600 dark:text-slate-400 max-w-md mx-auto">
                     Try adjusting your criteria. Many programs have income limits or location requirements.
                   </p>
@@ -304,7 +318,7 @@ export default function AssistancePage() {
                                   {program.type}
                                 </div>
                               </div>
-                              <CardTitle className="text-xl text-slate-900 dark:text-white">{program.name}</CardTitle>
+                              <CardTitle className="text-xl text-slate-900">{program.name}</CardTitle>
                               <CardDescription className="mt-2">{program.description}</CardDescription>
                             </div>
                             <div className="text-right">
@@ -378,5 +392,6 @@ export default function AssistancePage() {
         )}
       </div>
     </div>
+    </>
   );
 }
