@@ -128,7 +128,7 @@ export default function LandingPage() {
         Listings Hide the Truth
       </h3>
       <p className="text-slate-500 dark:text-slate-400 text-lg leading-relaxed">
-        Rent prices look affordable — until utilities, parking, insurance,
+        Rent prices look affordable - until utilities, parking, insurance,
         taxes, and commute costs appear.
         <br />
         People commit before knowing the <span className="font-bold">true cost</span>.
@@ -163,7 +163,7 @@ export default function LandingPage() {
         <br />
         Landlords organize collectively.
         <br />
-        There’s no easy way for communities to act together — until now.
+        There’s no easy way for communities to act together - until now.
       </p>
     </motion.div>
   </div>
