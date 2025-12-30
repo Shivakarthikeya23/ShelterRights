@@ -3,7 +3,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || 'placeholder_key');
 
 export class GeminiService {
-  private model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+  private model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
   private hasValidKey(): boolean {
     const key = process.env.GEMINI_API_KEY;
@@ -13,7 +13,7 @@ export class GeminiService {
   // Chat with tenant rights assistant
   async chatTenantRights(userMessage: string, state: string): Promise<string> {
     if (!this.hasValidKey()) {
-      return "I'm sorry, I cannot provide AI assistance at the moment because the Gemini API key is not configured. Please contact the administrator.";
+      return `**Tenant Rights Information for ${state}**\n\nBased on your question about "${userMessage}", here are some general guidelines:\n\n• Most states require landlords to provide 24-48 hours notice before entering your unit (except emergencies)\n• You have the right to a habitable dwelling with working utilities\n• Security deposits must be returned within 14-30 days (varies by state)\n• Rent increases typically require 30-60 days written notice\n\nFor specific legal advice about your situation in ${state}, I recommend contacting your local tenant rights organization or legal aid office. Many offer free consultations.\n\n*Note: AI analysis is currently limited. The information above is general guidance.*`;
     }
 
     try {
@@ -45,7 +45,20 @@ Keep your response friendly, clear, and under 300 words.`;
     burdenPercentage: number;
   }): Promise<string> {
     if (!this.hasValidKey()) {
-      return "Unable to provide AI analysis at this time. Please ensure your Gemini API key is correctly configured in the backend .env file.";
+      // Provide helpful fallback analysis based on burden percentage
+      const burden = data.burdenPercentage;
+      let analysis = `**Based on your ${burden.toFixed(1)}% rent burden:**\n\n`;
+      
+      if (burden < 30) {
+        analysis += `✅ Excellent! Your housing costs are well within the recommended 30% guideline. This leaves you with financial flexibility for savings, emergencies, and other goals.\n\n**Suggestions:**\n• Continue building your emergency fund (aim for 3-6 months expenses)\n• Consider increasing retirement contributions\n• You're in a good position to save for future goals like homeownership`;
+      } else if (burden < 40) {
+        analysis += `⚠️ Your rent burden is slightly elevated. While manageable, this may limit your financial flexibility.\n\n**Suggestions:**\n• Look for ways to increase income (side gigs, negotiating raise)\n• Consider finding a roommate to split costs\n• Review your budget for other areas to cut back\n• Even reducing rent by $200-300/month could significantly improve your financial health`;
+      } else {
+        analysis += `🚨 Your rent burden is significantly above the recommended 30%. This may be causing financial stress and limiting your ability to save.\n\n**Urgent Suggestions:**\n• Actively search for more affordable housing options\n• Consider relocating to a lower-cost neighborhood\n• Look into rent assistance programs in ${data.location}\n• Explore income opportunities to increase earnings\n• Connect with local tenant advocacy groups for resources`;
+      }
+      
+      analysis += `\n\n*Note: For personalized AI-powered financial advice, configure the Gemini API key in backend settings.*`;
+      return analysis;
     }
 
     try {
@@ -70,7 +83,7 @@ Be empathetic, practical, and under 200 words.`;
   // Generate campaign description
   async generateCampaignDescription(campaignTitle: string, location: string): Promise<string> {
     if (!this.hasValidKey()) {
-      return `This is a placeholder description for the campaign "${campaignTitle}" in ${location}. Please configure the Gemini API key to generate an AI-powered description.`;
+      return `**${campaignTitle}**\n\nJoin us in ${location} as we fight for fair housing practices and tenant rights. This campaign aims to bring about positive change in our community by addressing critical housing issues that affect working families.\n\n**Why This Matters:**\nRising housing costs are pushing families out of their homes and communities. By coming together, we can make our voices heard and demand accountability from landlords and policymakers.\n\n**Take Action:**\nSign this petition to show your support. Every signature brings us closer to achieving real change. Together, we can create a community where everyone has access to safe, affordable housing.\n\n*Note: Configure Gemini API key for AI-generated custom descriptions.*`;
     }
 
     try {
