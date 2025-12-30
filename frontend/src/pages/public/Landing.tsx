@@ -83,6 +83,93 @@ export default function LandingPage() {
           </div>
         </section>
 
+        {/* Problem Section */}
+<section className="container mx-auto px-6 py-24 max-w-7xl">
+  <motion.div
+    initial={{ opacity: 0, y: 30 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true }}
+    transition={{ duration: 0.8 }}
+    className="text-center mb-20"
+  >
+    <h2 className="text-4xl lg:text-5xl font-black mb-6 text-slate-900 dark:text-white tracking-tight">
+      The Housing Crisis Isn’t Abstract.
+      <br />
+      <span className="text-blue-600 dark:text-blue-400">It’s Personal.</span>
+    </h2>
+    <p className="text-slate-500 dark:text-slate-400 max-w-3xl mx-auto text-lg leading-relaxed">
+      These are not edge cases. This is everyday life for millions of Americans.
+    </p>
+  </motion.div>
+
+  <div className="grid md:grid-cols-2 gap-10">
+    {/* Problem 1 */}
+    <motion.div
+      whileHover={{ y: -6 }}
+      className="p-10 rounded-[2.5rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-xl"
+    >
+      <h3 className="text-2xl font-black mb-4 text-slate-900 dark:text-white">
+        Rent Is Breaking People
+      </h3>
+      <p className="text-slate-500 dark:text-slate-400 text-lg leading-relaxed">
+        Over <span className="font-bold text-slate-900 dark:text-white">50% of renters</span> spend more than
+        <span className="font-bold"> 30% of their income</span> on housing.
+        <br />
+        That means no savings, no safety net, and constant financial stress.
+      </p>
+    </motion.div>
+
+    {/* Problem 2 */}
+    <motion.div
+      whileHover={{ y: -6 }}
+      className="p-10 rounded-[2.5rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-xl"
+    >
+      <h3 className="text-2xl font-black mb-4 text-slate-900 dark:text-white">
+        Listings Hide the Truth
+      </h3>
+      <p className="text-slate-500 dark:text-slate-400 text-lg leading-relaxed">
+        Rent prices look affordable — until utilities, parking, insurance,
+        taxes, and commute costs appear.
+        <br />
+        People commit before knowing the <span className="font-bold">true cost</span>.
+      </p>
+    </motion.div>
+
+    {/* Problem 3 */}
+    <motion.div
+      whileHover={{ y: -6 }}
+      className="p-10 rounded-[2.5rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-xl"
+    >
+      <h3 className="text-2xl font-black mb-4 text-slate-900 dark:text-white">
+        People Don’t Know Their Rights
+      </h3>
+      <p className="text-slate-500 dark:text-slate-400 text-lg leading-relaxed">
+        Most renters only learn their tenant rights
+        <span className="font-bold"> after</span> facing illegal rent hikes,
+        unsafe conditions, or eviction notices.
+      </p>
+    </motion.div>
+
+    {/* Problem 4 */}
+    <motion.div
+      whileHover={{ y: -6 }}
+      className="p-10 rounded-[2.5rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-xl"
+    >
+      <h3 className="text-2xl font-black mb-4 text-slate-900 dark:text-white">
+        Housing Struggles Are Isolated
+      </h3>
+      <p className="text-slate-500 dark:text-slate-400 text-lg leading-relaxed">
+        Renters fight alone.
+        <br />
+        Landlords organize collectively.
+        <br />
+        There’s no easy way for communities to act together — until now.
+      </p>
+    </motion.div>
+  </div>
+</section>
+
+
         {/* Feature Grid */}
         <section className="container mx-auto px-6 py-24 max-w-7xl bg-slate-50/50 dark:bg-slate-900/20 rounded-[4rem] my-10">
           <div className="text-center mb-20">
