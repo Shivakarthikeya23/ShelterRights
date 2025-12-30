@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { Button } from '../../components/ui/button';
@@ -6,9 +7,11 @@ import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
 import { formatCurrency } from '../../lib/utils';
-import { Home, TrendingUp, Calculator, Info, DollarSign, Calendar } from 'lucide-react';
+import { Home, TrendingUp, Calculator, Info, DollarSign, Calendar, ArrowLeft } from 'lucide-react';
+import AppHeader from '@/components/layout/AppHeader';
 
 export default function RentVsBuyPage() {
+  const navigate = useNavigate();
   const [currentRent, setCurrentRent] = useState('1500');
   const [homePrice, setHomePrice] = useState('300000');
   const [downPayment, setDownPayment] = useState('60000');
@@ -81,22 +84,43 @@ export default function RentVsBuyPage() {
   
   // Recommendation logic
   const getRecommendation = () => {
-    if (breakEvenYear <= 3) return { text: "Buy Now", color: "text-green-600", advice: "Buying makes financial sense immediately. Your costs break even within 3 years." };
-    if (breakEvenYear <= 5) return { text: "Buy Soon", color: "text-blue-600", advice: "If you plan to stay 5+ years, buying is the better long-term choice." };
-    if (breakEvenYear <= years) return { text: "Consider Buying", color: "text-amber-600", advice: "Buying becomes advantageous after a few years. Ensure you're ready to stay long-term." };
-    return { text: "Keep Renting", color: "text-slate-600", advice: "For your timeline, renting offers more flexibility without the upfront costs." };
+    if (breakEvenYear <= 3)
+      return { text: "Buy Now", color: "text-green-600", advice: "Buying makes financial sense immediately." };
+  
+    if (breakEvenYear <= 5)
+      return { text: "Buy Soon", color: "text-blue-600", advice: "Buying is better if you stay 5+ years." };
+  
+    if (breakEvenYear < years)
+      return { text: "Consider Buying", color: "text-amber-600", advice: "Buying becomes advantageous later." };
+  
+    return {
+      text: "Keep Renting",
+      color: "text-slate-600",
+      advice: "Buying never breaks even within your planning horizon."
+    };
   };
+  
 
   const recommendation = getRecommendation();
 
   return (
+    <>
+    <AppHeader />
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-20">
       {/* Header */}
       <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 mb-8">
         <div className="container mx-auto px-4 py-12 max-w-7xl">
+          <Button
+            variant="ghost"
+            onClick={() => navigate('/dashboard')}
+            className="mb-4 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-900"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Dashboard
+          </Button>
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 text-sm font-medium mb-4">
             <TrendingUp className="h-4 w-4" />
-            <span>Financial Analysis</span>
+            Financial Analysis
           </div>
           <h1 className="text-4xl font-bold tracking-tight text-slate-900 dark:text-white mb-2">
             Rent vs Buy Analyzer
@@ -114,12 +138,12 @@ export default function RentVsBuyPage() {
             {/* Main Inputs */}
             <Card className="shadow-lg border-0">
               <CardHeader>
-                <CardTitle className="text-slate-900 dark:text-white">Scenario Details</CardTitle>
+                <CardTitle className="text-slate-900">Scenario Details</CardTitle>
                 <CardDescription>Enter your current situation and targets</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label className="text-slate-900 dark:text-white">Current Monthly Rent</Label>
+                  <Label className="text-slate-900">Current Monthly Rent</Label>
                   <div className="relative">
                     <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                     <Input
@@ -132,7 +156,7 @@ export default function RentVsBuyPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-slate-900 dark:text-white">Target Home Price</Label>
+                  <Label className="text-slate-900">Target Home Price</Label>
                   <div className="relative">
                     <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                     <Input
@@ -145,7 +169,7 @@ export default function RentVsBuyPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-slate-900 dark:text-white">Down Payment</Label>
+                  <Label className="text-slate-900">Down Payment</Label>
                   <div className="relative">
                     <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                     <Input
@@ -162,7 +186,7 @@ export default function RentVsBuyPage() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label className="text-slate-900 dark:text-white">Loan Term (Years)</Label>
+                    <Label className="text-slate-900">Loan Term (Years)</Label>
                     <Input
                       type="number"
                       className="h-11 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
@@ -171,7 +195,7 @@ export default function RentVsBuyPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-slate-900 dark:text-white">Planning Horizon</Label>
+                    <Label className="text-slate-900">Planning Horizon</Label>
                     <Input
                       type="number"
                       className="h-11 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
@@ -186,15 +210,15 @@ export default function RentVsBuyPage() {
             {/* Assumptions Panel */}
             <Card className="shadow-lg border-0">
               <CardHeader>
-                <CardTitle className="text-sm flex items-center gap-2 text-slate-900 dark:text-white">
+                <CardTitle className="text-sm flex items-center gap-2 text-slate-900">
                   <Info className="h-4 w-4" /> Assumptions (Editable)
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="space-y-1">
                   <div className="flex justify-between text-sm">
-                    <Label className="text-slate-700 dark:text-slate-300">Annual Rent Increase</Label>
-                    <span className="font-bold text-slate-900 dark:text-white">{rentIncrease}%</span>
+                    <Label className="text-slate-700">Annual Rent Increase</Label>
+                    <span className="font-bold text-slate-900">{rentIncrease}%</span>
                   </div>
                   <input
                     type="range"
@@ -209,8 +233,8 @@ export default function RentVsBuyPage() {
 
                 <div className="space-y-1">
                   <div className="flex justify-between text-sm">
-                    <Label className="text-slate-700 dark:text-slate-300">Home Appreciation</Label>
-                    <span className="font-bold text-slate-900 dark:text-white">{homeAppreciation}%</span>
+                    <Label className="text-slate-700">Home Appreciation</Label>
+                    <span className="font-bold text-slate-900">{homeAppreciation}%</span>
                   </div>
                   <input
                     type="range"
@@ -225,8 +249,8 @@ export default function RentVsBuyPage() {
 
                 <div className="space-y-1">
                   <div className="flex justify-between text-sm">
-                    <Label className="text-slate-700 dark:text-slate-300">Interest Rate</Label>
-                    <span className="font-bold text-slate-900 dark:text-white">{interestRate}%</span>
+                    <Label className="text-slate-700">Interest Rate</Label>
+                    <span className="font-bold text-slate-900">{interestRate}%</span>
                   </div>
                   <input
                     type="range"
@@ -241,8 +265,8 @@ export default function RentVsBuyPage() {
 
                 <div className="space-y-1">
                   <div className="flex justify-between text-sm">
-                    <Label className="text-slate-700 dark:text-slate-300">Property Tax Rate</Label>
-                    <span className="font-bold text-slate-900 dark:text-white">{propertyTaxRate}%</span>
+                    <Label className="text-slate-700">Property Tax Rate</Label>
+                    <span className="font-bold text-slate-900">{propertyTaxRate}%</span>
                   </div>
                   <input
                     type="range"
@@ -353,5 +377,6 @@ export default function RentVsBuyPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }
