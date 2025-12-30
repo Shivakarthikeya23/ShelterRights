@@ -14,8 +14,7 @@ export default function ModeSwitcher() {
     try {
       await userApi.switchMode(mode);
       switchMode(mode);
-      // Refresh the page to show updated features
-      window.location.reload();
+      // State management will automatically update the UI - no reload needed!
     } catch (error) {
       console.error('Failed to switch mode:', error);
     }

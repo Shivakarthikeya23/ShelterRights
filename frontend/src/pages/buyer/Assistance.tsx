@@ -144,7 +144,7 @@ export default function AssistancePage() {
           <Button
             variant="ghost"
             onClick={() => navigate('/dashboard')}
-            className="mb-4 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
+            className="mb-4 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-900"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Dashboard
