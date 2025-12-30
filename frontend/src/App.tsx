@@ -19,6 +19,11 @@ import AssistancePage from "./pages/buyer/Assistance";
 import PropertySearchPage from "./pages/public/PropertySearch";
 import RightsChatbotPage from "./pages/renter/RightsChatbot";
 import CommunityOrganizerPage from "./pages/renter/CommunityOrganizer";
+import ProfilePage from "./pages/user/Profile";
+import PropertyTaxPage from "./pages/homeowner/PropertyTax";
+import RefinancePage from "./pages/homeowner/Refinance";
+import HOATrackerPage from "./pages/homeowner/HOATracker";
+import ForeclosurePage from "./pages/homeowner/Foreclosure";
 
 // Protected Route Component
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -40,9 +45,22 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 }
 
 function App() {
-  const { setUser, initialize } = useAuthStore();
+  const { setUser, setLoading, initialize } = useAuthStore();
 
   useEffect(() => {
+    // Initialize dark mode from localStorage
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else if (savedTheme === 'light') {
+      document.documentElement.classList.remove('dark');
+    } else {
+      // Default to system preference
+      if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.documentElement.classList.add('dark');
+      }
+    }
+
     // Initialize auth state
     initialize();
 
@@ -130,6 +148,54 @@ function App() {
             element={
               <ProtectedRoute>
                 <CommunityOrganizerPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <ProtectedRoute>
+                <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/property-tax"
+            element={
+              <ProtectedRoute>
+                <PropertyTaxPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/refinance"
+            element={
+              <ProtectedRoute>
+                <RefinancePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/hoa-tracker"
+            element={
+              <ProtectedRoute>
+                <HOATrackerPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/foreclosure"
+            element={
+              <ProtectedRoute>
+                <ForeclosurePage />
               </ProtectedRoute>
             }
           />
