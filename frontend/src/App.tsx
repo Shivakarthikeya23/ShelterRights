@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useAuthStore } from "./stores/authStore";
 import { supabase } from "./lib/supabase";
+import { ThemeProvider } from "./contexts/ThemeContext";
 
 // Import styles
 import "./index.css";
@@ -48,19 +49,6 @@ function App() {
   const { setUser, setLoading, initialize } = useAuthStore();
 
   useEffect(() => {
-    // Initialize dark mode from localStorage
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else if (savedTheme === 'light') {
-      document.documentElement.classList.remove('dark');
-    } else {
-      // Default to system preference
-      if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        document.documentElement.classList.add('dark');
-      }
-    }
-
     // Initialize auth state
     initialize();
 
@@ -77,9 +65,10 @@ function App() {
   }, [setUser, initialize]);
 
   return (
-    <BrowserRouter>
-      <div className="min-h-screen bg-background text-slate-900 dark:text-slate-100">
-        <Routes>
+    <ThemeProvider>
+      <BrowserRouter>
+        <div className="min-h-screen bg-background text-slate-900 dark:text-slate-100">
+          <Routes>
           {/* Public routes */}
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage />} />
@@ -202,9 +191,10 @@ function App() {
 
           {/* Catch all */}
           <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </div>
-    </BrowserRouter>
+          </Routes>
+        </div>
+      </BrowserRouter>
+    </ThemeProvider>
   );
 }
 

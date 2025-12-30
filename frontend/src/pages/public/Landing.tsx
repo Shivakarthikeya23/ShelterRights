@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Button } from '../../components/ui/button';
 import { Home, Shield, Users, ArrowRight, CheckCircle2, Globe, Calculator } from 'lucide-react';
 import { motion } from 'framer-motion';
+import ThemeToggle from '../../components/theme/ThemeToggle';
 
 export default function LandingPage() {
   return (
@@ -17,7 +18,8 @@ export default function LandingPage() {
               ShelterRights
             </span>
           </div>
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-4">
+            <ThemeToggle />
             <Link to="/login" className="text-sm font-bold text-slate-600 dark:text-slate-400 hover:text-blue-600 transition-colors">Sign in</Link>
             <Link to="/signup">
               <Button size="sm" className="bg-blue-600 text-white hover:bg-blue-700 transition-all rounded-full px-6 font-bold">

@@ -2,6 +2,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
 import { useUserStore } from '../../stores/userStore';
 import ModeSwitcher from '../mode-switcher/ModeSwitcher';
+import ThemeToggle from '../theme/ThemeToggle';
 import { Button } from '../ui/button';
 import { 
   DropdownMenu, 
@@ -37,6 +38,9 @@ export default function AppHeader() {
 
         {/* Right side actions */}
         <div className="flex items-center gap-3">
+          {/* Theme Toggle */}
+          <ThemeToggle />
+          
           {/* Hamburger Menu (3 Lines) */}
           {user && (
             <DropdownMenu>
