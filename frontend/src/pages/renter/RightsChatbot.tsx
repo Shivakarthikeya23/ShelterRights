@@ -1,19 +1,28 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import ReactMarkdown from 'react-markdown';
+import AppHeader from '../../components/layout/AppHeader';
 import { renterApi } from '../../lib/renterApi';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
 import { Alert, AlertDescription } from '../../components/ui/alert';
-import { Loader2, Send, Bot, User, MessageSquare, ShieldCheck, MapPin } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
+import { Loader2, Send, Bot, User, MessageSquare, ShieldCheck, MapPin, ArrowLeft } from 'lucide-react';
+import { US_STATES } from '../../lib/constants';
+import { useNavigate } from 'react-router-dom';
 
 export default function RightsChatbotPage() {
+  const navigate = useNavigate();
   const [message, setMessage] = useState('');
-  const [state, setState] = useState('Texas'); // Default
+  const [state, setState] = useState('TX'); // Default to Texas
   const [chatHistory, setChatHistory] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  
+  // Get state label for display
+  const stateLabel = US_STATES.find(s => s.value === state)?.label || state;
 
   useEffect(() => {
     scrollToBottom();
@@ -37,7 +46,7 @@ export default function RightsChatbotPage() {
     setIsTyping(true);
 
     try {
-      const data = await renterApi.chat(userMsg, state);
+      const data = await renterApi.chat(userMsg, stateLabel);
       setChatHistory(prev => [...prev, { role: 'assistant', content: data.response, timestamp: new Date().toISOString() }]);
     } catch (err) {
       console.error('Chat error:', err);
@@ -55,9 +64,18 @@ export default function RightsChatbotPage() {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col">
+      <AppHeader />
       {/* Sticky Header */}
-      <header className="bg-white dark:bg-slate-900 border-b p-4 sticky top-0 z-10">
+      <header className="bg-white dark:bg-slate-900 border-b p-4 z-10">
         <div className="container mx-auto max-w-4xl flex items-center justify-between">
+        <Button
+            variant="ghost"
+            onClick={() => navigate('/dashboard')}
+            className="mb-4 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-900"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Dashboard
+          </Button>
            <div className="flex items-center gap-3">
              <div className="bg-blue-600 rounded-xl p-2 shadow-lg shadow-blue-600/20">
                <ShieldCheck className="text-white h-6 w-6" />
@@ -69,17 +87,18 @@ export default function RightsChatbotPage() {
            </div>
            <div className="flex items-center gap-2">
               <MapPin className="h-4 w-4 text-slate-400" />
-              <select 
-                value={state} 
-                onChange={(e) => setState(e.target.value)}
-                className="bg-slate-100 dark:bg-slate-800 border-none rounded-lg px-3 py-1.5 text-sm font-bold appearance-none cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
-              >
-                <option value="Texas">Texas</option>
-                <option value="California">California</option>
-                <option value="New York">New York</option>
-                <option value="Florida">Florida</option>
-                <option value="Illinois">Illinois</option>
-              </select>
+              <Select value={state} onValueChange={setState}>
+                <SelectTrigger className="bg-slate-100 dark:bg-slate-800 border-none rounded-lg px-3 py-1.5 text-sm font-bold w-[180px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {US_STATES.map((stateOption) => (
+                    <SelectItem key={stateOption.value} value={stateOption.value}>
+                      {stateOption.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
            </div>
         </div>
       </header>
@@ -91,7 +110,7 @@ export default function RightsChatbotPage() {
              <div className="bg-white dark:bg-slate-900 p-8 rounded-[3rem] shadow-2xl shadow-blue-500/5 border">
                <Bot size={64} className="text-blue-600 mx-auto mb-6" />
                <h2 className="text-3xl font-black mb-2 dark:text-white">How can I help you today?</h2>
-               <p className="text-slate-500 dark:text-slate-400 max-w-sm mx-auto">Ask me about evictions, repairs, deposits, or local housing ordinances in {state}.</p>
+               <p className="text-slate-500 dark:text-slate-400 max-w-sm mx-auto">Ask me about evictions, repairs, deposits, or local housing ordinances in {stateLabel}.</p>
              </div>
              
              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-lg">
@@ -125,7 +144,28 @@ export default function RightsChatbotPage() {
                 {chat.role === 'user' ? <User size={20} /> : <Bot size={20} />}
               </div>
               <div className={`max-w-[80%] p-5 rounded-3xl text-sm leading-relaxed shadow-sm border ${chat.role === 'user' ? 'bg-white dark:bg-slate-900 rounded-tr-none' : 'bg-blue-50 dark:bg-blue-900/20 dark:border-blue-800/30 rounded-tl-none text-slate-800 dark:text-slate-200'}`}>
-                 {chat.content}
+                 {chat.role === 'assistant' ? (
+                   <div className="prose prose-sm dark:prose-invert max-w-none">
+                     <ReactMarkdown
+                       components={{
+                         p: ({ children }) => <p className="mb-3 last:mb-0">{children}</p>,
+                         strong: ({ children }) => <strong className="font-bold text-slate-900 dark:text-slate-100">{children}</strong>,
+                         ul: ({ children }) => <ul className="list-disc list-inside mb-3 space-y-1">{children}</ul>,
+                         ol: ({ children }) => <ol className="list-decimal list-inside mb-3 space-y-1">{children}</ol>,
+                         li: ({ children }) => <li className="ml-2">{children}</li>,
+                         h1: ({ children }) => <h1 className="text-lg font-bold mb-2">{children}</h1>,
+                         h2: ({ children }) => <h2 className="text-base font-bold mb-2">{children}</h2>,
+                         h3: ({ children }) => <h3 className="text-sm font-bold mb-1">{children}</h3>,
+                         code: ({ children }) => <code className="bg-slate-200 dark:bg-slate-700 px-1 rounded text-xs">{children}</code>,
+                         blockquote: ({ children }) => <blockquote className="border-l-4 border-blue-500 pl-3 italic my-2">{children}</blockquote>,
+                       }}
+                     >
+                       {chat.content}
+                     </ReactMarkdown>
+                   </div>
+                 ) : (
+                   chat.content
+                 )}
                  {chat.isError && <div className="mt-2 text-xs font-bold text-red-500 uppercase">System Notice</div>}
               </div>
             </motion.div>
@@ -151,7 +191,7 @@ export default function RightsChatbotPage() {
         <div className="container mx-auto max-w-4xl">
           <form onSubmit={handleSendMessage} className="relative group">
             <Input 
-              placeholder={`Ask about tenant rights in ${state}...`} 
+              placeholder={`Ask about tenant rights in ${stateLabel}...`} 
               className="h-16 pl-6 pr-20 bg-slate-50 dark:bg-slate-800 border-none rounded-[1.5rem] text-base focus-visible:ring-2 focus-visible:ring-blue-600 shadow-inner"
               value={message}
               onChange={(e) => setMessage(e.target.value)}

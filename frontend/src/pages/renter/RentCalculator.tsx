@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import AppHeader from '../../components/layout/AppHeader';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell,
   PieChart, Pie
@@ -21,10 +22,13 @@ import {
   ArrowRight,
   Share2,
   Wallet,
-  Home
+  Home,
+  ArrowLeft
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export default function RentCalculatorPage() {
+  const navigate = useNavigate();
   const [income, setIncome] = useState('');
   const [rent, setRent] = useState('');
   const [city, setCity] = useState('');
@@ -74,10 +78,20 @@ export default function RentCalculatorPage() {
   ] : [];
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-20">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+      <AppHeader />
+      <div className="pb-20">
       {/* Hero Section */}
       <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 mb-8">
         <div className="container mx-auto px-4 py-12 max-w-6xl">
+        <Button
+            variant="ghost"
+            onClick={() => navigate('/dashboard')}
+            className="mb-4 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-900"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Dashboard
+          </Button>
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div>
               <motion.div 
@@ -96,8 +110,8 @@ export default function RentCalculatorPage() {
               </p>
             </div>
             {result && (
-              <Button variant="outline" className="gap-2 self-start md:self-center">
-                <Share2 className="h-4 w-4" />
+              <Button variant="outline" className="gap-2 self-start md:self-center text-black">
+                <Share2 className="h-4 w-4 text-black" />
                 Share Results
               </Button>
             )}
@@ -326,25 +340,25 @@ export default function RentCalculatorPage() {
                     <Card className="shadow-md bg-blue-600 text-white border-0 overflow-hidden relative">
                       <div className="absolute -right-10 -top-10 bg-white/10 w-32 h-32 rounded-full blur-3xl" />
                       <CardHeader>
-                        <CardTitle className="text-sm font-bold flex items-center gap-2">
-                          <Wallet className="h-4 w-4" /> Potential Savings
+                        <CardTitle className="text-sm font-bold flex items-center gap-2 text-black">
+                          <Wallet className="h-4 w-4 text-black" /> Potential Savings
                         </CardTitle>
                       </CardHeader>
                       <CardContent>
                         {result.isHealthy ? (
                           <div className="flex flex-col h-full justify-center">
-                            <p className="text-blue-100 text-sm mb-4">You are already meeting the 30% guideline. Excellent work!</p>
-                            <div className="text-3xl font-black">$0 saved</div>
+                            <p className="text-blue-900 text-sm mb-4">You are already meeting the 30% guideline. Excellent work!</p>
+                            <div className="text-3xl text-blue-900 font-black">$0 saved</div>
                           </div>
                         ) : (
                           <div className="space-y-6">
                             <div>
-                              <div className="text-xs font-bold uppercase tracking-widest text-blue-200 mb-1">Monthly Overpayment</div>
-                              <div className="text-3xl font-black">{formatCurrency(result.monthlyOverpayment)}</div>
+                              <div className="text-xs font-bold uppercase tracking-widest text-blue-700 mb-1">Monthly Overpayment</div>
+                              <div className="text-3xl font-black text-black">{formatCurrency(result.monthlyOverpayment)}</div>
                             </div>
                             <div>
-                                <div className="text-xs font-bold uppercase tracking-widest text-blue-200 mb-1">Annual Savings Potential</div>
-                                <div className="text-4xl font-black bg-white/20 inline-block px-4 py-2 rounded-2xl">
+                                <div className="text-xs font-bold uppercase tracking-widest text-blue-700 mb-1">Annual Savings Potential</div>
+                                <div className="text-4xl font-black bg-black/20 inline-block px-4 py-2 rounded-2xl text-black">
                                   {formatCurrency(result.annualOverpayment)}
                                 </div>
                             </div>
@@ -394,6 +408,7 @@ export default function RentCalculatorPage() {
             </AnimatePresence>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );
