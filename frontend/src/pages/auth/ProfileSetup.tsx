@@ -9,6 +9,7 @@ import { Alert, AlertDescription } from '../../components/ui/alert';
 import { Checkbox } from '../../components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
 import { Loader2 } from 'lucide-react';
+import { US_STATES } from '../../lib/constants';
 
 export default function ProfileSetupPage() {
   const [step, setStep] = useState(1);
@@ -21,6 +22,7 @@ export default function ProfileSetupPage() {
   const [isOwner, setIsOwner] = useState(false);
   
   // Step 2: Basic info
+  const [fullName, setFullName] = useState('');
   const [annualIncome, setAnnualIncome] = useState('');
   const [locationCity, setLocationCity] = useState('');
   const [locationState, setLocationState] = useState('');
@@ -39,6 +41,7 @@ export default function ProfileSetupPage() {
       else if (isOwner) currentMode = 'owner';
 
       await userApi.setupProfile({
+        fullName: fullName || undefined,
         annualIncome: parseFloat(annualIncome),
         locationCity,
         locationState,
@@ -142,6 +145,18 @@ export default function ProfileSetupPage() {
               <h3 className="font-semibold text-lg">Basic Information</h3>
               
               <div className="space-y-2">
+                <Label htmlFor="fullName">Full Name</Label>
+                <Input
+                  id="fullName"
+                  placeholder="John Doe"
+                  value={fullName}
+                  onChange={(e: any) => setFullName(e.target.value)}
+                  required
+                  disabled={isLoading}
+                />
+              </div>
+
+              <div className="space-y-2">
                 <Label htmlFor="income">Annual Income</Label>
                 <Input
                   id="income"
@@ -173,11 +188,12 @@ export default function ProfileSetupPage() {
                     <SelectTrigger>
                       <SelectValue placeholder="Select state" />
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="TX">Texas</SelectItem>
-                      <SelectItem value="CA">California</SelectItem>
-                      <SelectItem value="NY">New York</SelectItem>
-                      <SelectItem value="MI">Michigan</SelectItem>
+                    <SelectContent className="max-h-[300px]">
+                      {US_STATES.map((state) => (
+                        <SelectItem key={state.value} value={state.value}>
+                          {state.label}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
@@ -206,7 +222,7 @@ export default function ProfileSetupPage() {
                 </Button>
                 <Button 
                   onClick={handleSubmit}
-                  disabled={isLoading || !annualIncome || !locationCity || !locationState}
+                  disabled={isLoading || !fullName || !annualIncome || !locationCity || !locationState}
                   className="flex-1"
                 >
                   {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
